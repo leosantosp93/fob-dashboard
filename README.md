@@ -2,8 +2,6 @@
 
 Interactive dashboard for monitoring ocean freight rates across all active lanes for **Transnational Foods LLC** and **Pampa Beverages**.
 
-🔗 **[Open Dashboard](https://yourusername.github.io/fob-dashboard)**
-
 ---
 
 ## What it shows
