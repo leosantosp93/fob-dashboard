@@ -81,6 +81,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .rc-badge.up{background:rgba(252,165,165,.15);color:#FCA5A5}
 .rc-badge.dn{background:rgba(110,231,183,.15);color:#6EE7B7}
 .rc-badge.flat{background:rgba(123,158,192,.1);color:var(--text-dim)}
+.region-card.dimmed{opacity:.25;filter:grayscale(.6);pointer-events:none}
 .movers-card{
   background:linear-gradient(135deg,var(--bg2),var(--bg3));
   border:1px solid var(--border);border-radius:var(--radius);
@@ -461,34 +462,35 @@ function updateChart() {
 
 // ─── Region Cards ────────────────────────────────────────────────────────────
 function updateRegionCards() {
-  const rows  = DB[company];
+  const filtered = getRows();
+  const allRows  = DB[company];
   const q1m   = ["ENE","FEB","MAR"].filter(m => MONTHS.includes(m));
-  const latM  = [...MONTHS].reverse().find(m => rows.some(r => r.rates[m] != null));
+  const latM  = [...MONTHS].reverse().find(m => allRows.some(r => r.rates[m] != null));
 
-  // Compute avg rate per section for q1 and latest month
   const sectionStats = SECTIONS.map(sec => {
-    const secRows = rows.filter(r => r.section === sec);
+    const secRows = filtered.filter(r => r.section === sec);
+    const hasData = secRows.length > 0;
     const q1vals  = secRows.flatMap(r => q1m.map(m => r.rates[m]).filter(v => v != null));
     const latvals = latM ? secRows.map(r => r.rates[latM]).filter(v => v != null) : [];
     const q1avg   = q1vals.length  ? Math.round(q1vals.reduce((a,b)=>a+b)/q1vals.length)  : null;
     const latavg  = latvals.length ? Math.round(latvals.reduce((a,b)=>a+b)/latvals.length) : null;
     const pct     = q1avg && latavg ? +((latavg - q1avg) / q1avg * 100).toFixed(1) : null;
     const shortLabel = sec.replace("→ NORFOLK","→ NF").replace("→ LA","→ LA").replace("SUDAMÉRICA","S.AM.");
-    return { sec, shortLabel, q1avg, latavg, pct };
+    return { sec, shortLabel, q1avg, latavg, pct, hasData };
   });
 
   document.getElementById("region-cards").innerHTML = sectionStats.map(s => {
     const cls  = s.pct == null ? "flat" : s.pct > 0 ? "up" : s.pct < 0 ? "dn" : "flat";
-    const bCls = cls;
+    const dimmed = !s.hasData ? " dimmed" : "";
     const arrow = s.pct == null ? "" : s.pct > 0 ? "↑" : s.pct < 0 ? "↓" : "→";
     const pctTxt = s.pct == null ? "sin datos" : (s.pct > 0 ? "+" : "") + s.pct + "% vs Q1";
     const rateDisplay = s.latavg ? "$" + s.latavg.toLocaleString() : "—";
     const subTxt = latM ? `Prom. ${latM} 2026` : "Sin datos recientes";
-    return `<div class="region-card ${cls}">
+    return `<div class="region-card ${cls}${dimmed}">
       <div class="rc-label">${s.shortLabel}</div>
       <div class="rc-rate">${rateDisplay}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
-        <span class="rc-badge ${bCls}">${arrow} ${pctTxt}</span>
+        <span class="rc-badge ${cls}">${arrow} ${pctTxt}</span>
       </div>
       <div style="font-size:10px;color:var(--text-muted);margin-top:5px">${subTxt}</div>
     </div>`;
