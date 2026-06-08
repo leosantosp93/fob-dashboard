@@ -366,7 +366,7 @@ function fmtPct(v){ return v == null ? "S/C" : (v>0?"+":"") + v + "%"; }
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 function updateKPIs() {
-  const rows = DB[company];
+  const rows = getRows();
   const q1m  = ["ENE","FEB","MAR"].filter(m => MONTHS.includes(m));
   const q2m  = MONTHS.filter(m => !q1m.includes(m));
   const q1v  = rows.flatMap(r => q1m.map(m=>r.rates[m]).filter(v=>v!=null));
@@ -617,6 +617,7 @@ function setView(v) {
 }
 
 function onFilter() {
+  updateKPIs();
   updateChart();
   updateRegionCards();
   updateMovers();
