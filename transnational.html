@@ -632,7 +632,67 @@ updateRegionCards();
 updateMovers();
 renderTable();
 </script>
+<style>
+#pw-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:#060D1A;display:flex;align-items:center;justify-content:center;
+}
+.pw-box{
+  background:linear-gradient(135deg,#0B1628,#101F36);
+  border:1px solid #1E3A5F;border-radius:14px;
+  padding:40px 48px;text-align:center;width:360px;
+  box-shadow:0 16px 48px rgba(0,0,0,.6);
+}
+.pw-logo{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+.pw-title{font-size:22px;font-weight:800;margin-bottom:6px;color:#E8F2FF}
+.pw-sub{font-size:12px;color:#7B9EC0;margin-bottom:28px;line-height:1.6}
+.pw-input{
+  width:100%;padding:11px 14px;border-radius:8px;
+  background:#060D1A;border:1px solid #1E3A5F;
+  color:#E8F2FF;font-size:15px;font-family:inherit;
+  outline:none;text-align:center;letter-spacing:.12em;
+  margin-bottom:12px;transition:border-color .2s;
+}
+.pw-input:focus{border-color:#0EA5E9}
+.pw-btn{
+  width:100%;padding:11px;border-radius:8px;border:none;
+  background:#0EA5E9;color:#000;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;transition:opacity .2s;margin-bottom:8px;
+}
+.pw-btn:hover{opacity:.85}
+.pw-error{font-size:12px;color:#FCA5A5;min-height:18px}
+</style>
+<div id="pw-overlay">
+  <div class="pw-box">
+    <div class="pw-logo" style="color:#0EA5E9">Transnational Foods LLC</div>
+    <div class="pw-title">FOB Ocean Rates 2026</div>
+    <div class="pw-sub">This dashboard is restricted.<br>Enter your password to continue.</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="••••••••••" 
+           onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Access Dashboard →</button>
+    <div class="pw-error" id="pw-error"></div>
+  </div>
+</div>
+<script>
+(function(){
+  if(sessionStorage.getItem('tnf_fob_2026')==='ok')
+    document.getElementById('pw-overlay').remove();
+})();
+function checkPw(){
+  if(document.getElementById('pw-input').value==='TNF2026fob'){
+    sessionStorage.setItem('tnf_fob_2026','ok');
+    document.getElementById('pw-overlay').remove();
+  } else {
+    document.getElementById('pw-error').textContent='Incorrect password. Please try again.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+</script>
 </body>
 </html>
+
+
+
 
 
