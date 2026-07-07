@@ -505,19 +505,22 @@ function updateMovers() {
   if (!latestM) return;
   const moves = rows
     .filter(r => r.mom[latestM] !== null && r.mom[latestM] !== undefined)
-    .map(r => ({ route:r.route, cont:r.cont, pct:r.mom[latestM], rate:r.rates[latestM] }))
-    .sort((a,b) => b.pct - a.pct);
+    .map(r => ({ route:r.route, dest:r.dest, cont:r.cont, pct:r.mom[latestM], rate:r.rates[latestM] }));
+
+  // Split by direction so an increase can never appear under "drops" (and vice-versa)
+  const ups   = moves.filter(m => m.pct > 0).sort((a,b) => b.pct - a.pct);
+  const downs = moves.filter(m => m.pct < 0).sort((a,b) => a.pct - b.pct);
 
   const render = (items, cls) => items.slice(0,4).map(m =>
     `<div class="mover-item">
-      <span class="mover-route" title="${m.route}">${m.route.replace("–","–").substring(0,28)}</span>
-      <span style="font-size:10px;color:var(--text-muted);margin-right:4px">${m.cont}</span>
+      <span class="mover-route" title="${m.route} → ${m.dest}">${m.route.replace("–","–").substring(0,26)}</span>
+      <span style="font-size:10px;color:var(--text-muted);margin-right:4px">${m.dest} · ${m.cont}</span>
       <span class="mover-pct ${cls}">${m.pct>0?"+":""}${m.pct}%</span>
     </div>`
-  ).join("");
+  ).join("") || `<div class="mover-item" style="color:var(--text-muted)">Sin variaciones</div>`;
 
-  document.getElementById("movers-up").innerHTML = render(moves, "badge-up");
-  document.getElementById("movers-dn").innerHTML = render([...moves].reverse(), "badge-dn");
+  document.getElementById("movers-up").innerHTML = render(ups, "badge-up");
+  document.getElementById("movers-dn").innerHTML = render(downs, "badge-dn");
 }
 
 // ─── Table ───────────────────────────────────────────────────────────────────
